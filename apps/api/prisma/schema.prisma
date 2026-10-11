@@ -1,0 +1,219 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  STUDENT
+  MODERATOR
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum ConsentStatus {
+  PENDING
+  ACTIVE
+  WITHDRAWN
+}
+
+enum ProfileStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REMOVED
+}
+
+enum BattleStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum ModerationStatus {
+  VISIBLE
+  HIDDEN
+  REMOVED
+  FLAGGED
+}
+
+enum ReportTargetType {
+  COMMENT
+  STUDENT
+  BATTLE
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id            String        @id @default(uuid()) @db.Uuid
+  email         String        @unique @db.VarChar(255)
+  passwordHash  String        @map("password_hash") @db.VarChar(255)
+  role          UserRole      @default(STUDENT)
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  student   Student?
+  votes     Vote[]
+  comments  Comment[]
+  reports   Report[]
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Student {
+  id                String        @id @default(uuid()) @db.Uuid
+  userId            String?       @unique @map("user_id") @db.Uuid
+  displayName       String        @map("display_name") @db.VarChar(100)
+  department        String?       @db.VarChar(150)
+  imageStorageKey   String        @map("image_storage_key") @db.VarChar(500)
+  imageUrl          String?       @map("image_url") @db.VarChar(1000)
+  consentStatus     ConsentStatus @default(PENDING) @map("consent_status")
+  consentRecordedAt DateTime?     @map("consent_recorded_at")
+  profileStatus     ProfileStatus @default(PENDING) @map("profile_status")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  user                 User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  battlesAsA           Battle[]              @relation("ContestantABattles")
+  battlesAsB           Battle[]              @relation("ContestantBBattles")
+  votesReceived        Vote[]                @relation("SelectedStudent")
+  consentRecords       ConsentRecord[]
+  leaderboardAggregate LeaderboardAggregate?
+
+  @@index([profileStatus, consentStatus])
+  @@index([displayName])
+  @@map("students")
+}
+
+model Battle {
+  id            String       @id @default(uuid()) @db.Uuid
+  contestantAId String       @map("contestant_a_id") @db.Uuid
+  contestantBId String       @map("contestant_b_id") @db.Uuid
+  status        BattleStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  closedAt      DateTime?    @map("closed_at")
+
+  contestantA Student   @relation("ContestantABattles", fields: [contestantAId], references: [id], onDelete: Restrict)
+  contestantB Student   @relation("ContestantBBattles", fields: [contestantBId], references: [id], onDelete: Restrict)
+  votes       Vote[]
+  comments    Comment[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([contestantAId])
+  @@index([contestantBId])
+  @@map("battles")
+}
+
+model Vote {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  battleId          String   @map("battle_id") @db.Uuid
+  selectedStudentId String   @map("selected_student_id") @db.Uuid
+  idempotencyKey    String   @unique @map("idempotency_key") @db.VarChar(128)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user            User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  battle          Battle  @relation(fields: [battleId], references: [id], onDelete: Restrict)
+  selectedStudent Student @relation("SelectedStudent", fields: [selectedStudentId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, battleId])
+  @@index([battleId])
+  @@index([selectedStudentId])
+  @@index([userId])
+  @@map("votes")
+}
+
+model Comment {
+  id               String           @id @default(uuid()) @db.Uuid
+  userId           String           @map("user_id") @db.Uuid
+  battleId         String           @map("battle_id") @db.Uuid
+  body             String           @db.Text
+  moderationStatus ModerationStatus @default(VISIBLE) @map("moderation_status")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  battle Battle @relation(fields: [battleId], references: [id], onDelete: Restrict)
+
+  @@index([battleId, createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([moderationStatus])
+  @@map("comments")
+}
+
+model Report {
+  id             String           @id @default(uuid()) @db.Uuid
+  reporterUserId String           @map("reporter_user_id") @db.Uuid
+  targetType     ReportTargetType @map("target_type")
+  targetId       String           @map("target_id") @db.Uuid
+  reason         String           @db.VarChar(500)
+  status         ReportStatus     @default(PENDING)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  resolvedAt     DateTime?        @map("resolved_at")
+
+  reporter User @relation(fields: [reporterUserId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([targetType, targetId])
+  @@map("reports")
+}
+
+model ConsentRecord {
+  id             String        @id @default(uuid()) @db.Uuid
+  studentId      String        @map("student_id") @db.Uuid
+  consentVersion String        @map("consent_version") @db.VarChar(50)
+  termsText      String        @map("terms_text") @db.Text
+  status         ConsentStatus @default(ACTIVE)
+  ipAddressHash  String?       @map("ip_address_hash") @db.VarChar(128)
+  recordedAt     DateTime      @default(now()) @map("recorded_at")
+  withdrawnAt    DateTime?     @map("withdrawn_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+
+  @@index([studentId, recordedAt(sort: Desc)])
+  @@map("consent_records")
+}
+
+model LeaderboardAggregate {
+  studentId        String   @id @map("student_id") @db.Uuid
+  totalVotes       Int      @default(0) @map("total_votes")
+  rank             Int      @default(0)
+  lastReconciledAt DateTime @default(now()) @map("last_reconciled_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([totalVotes(sort: Desc)])
+  @@map("leaderboard_aggregates")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorUserId  String?  @map("actor_user_id") @db.Uuid
+  action       String   @db.VarChar(100)
+  targetEntity String   @map("target_entity") @db.VarChar(50)
+  targetId     String?  @map("target_id") @db.VarChar(100)
+  metadata     Json?    @db.JsonB
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([targetEntity, targetId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
