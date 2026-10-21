@@ -56,7 +56,7 @@ export async function studentsRoutes(app: FastifyInstance) {
       });
     }
 
-    const { displayName, department, consentVersion } = parseResult.data;
+    const { displayName, department, consentVersion, imageUrl, imageStorageKey } = parseResult.data;
 
     // Check if student profile exists or create one
     let student = await prisma.student.findUnique({
@@ -70,27 +70,25 @@ export async function studentsRoutes(app: FastifyInstance) {
           userId,
           displayName: displayName || request.user!.email.split('@')[0],
           department: department || null,
-          imageStorageKey: 'defaults/avatar-placeholder.png',
-          imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+          imageStorageKey: imageStorageKey || 'defaults/avatar-placeholder.png',
+          imageUrl: imageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
           consentStatus: ConsentStatus.ACTIVE,
           consentRecordedAt: new Date(),
           profileStatus: ProfileStatus.PENDING   // ← Admin approval required
         }
       });
     } else {
-      // Re-consent: keep existing status if already approved, else reset to PENDING
-      const newStatus = student.profileStatus === ProfileStatus.APPROVED
-        ? ProfileStatus.APPROVED
-        : ProfileStatus.PENDING;
-
+      // Re-consent or profile update with image: if new image or new submission, set to PENDING for admin review
       student = await prisma.student.update({
         where: { id: student.id },
         data: {
           displayName: displayName || student.displayName,
           department: department !== undefined ? department : student.department,
+          imageUrl: imageUrl || student.imageUrl,
+          imageStorageKey: imageStorageKey || student.imageStorageKey,
           consentStatus: ConsentStatus.ACTIVE,
           consentRecordedAt: new Date(),
-          profileStatus: newStatus
+          profileStatus: ProfileStatus.PENDING // Send for admin review
         }
       });
     }

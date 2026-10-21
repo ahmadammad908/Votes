@@ -36,7 +36,7 @@ export async function sendVerificationEmail(to: string, otp: string): Promise<vo
     </head>
     <body>
       <div class="container">
-        <div class="logo"><span>🔥 CampusFace</span></div>
+        <div class="logo"><span>🔥 Superior Connection</span></div>
         <h2>Verify Your Email Address</h2>
         <p>Use the code below to verify your university email and complete registration.</p>
         <div class="otp-box">
@@ -52,7 +52,7 @@ export async function sendVerificationEmail(to: string, otp: string): Promise<vo
   await transporter.sendMail({
     from: env.EMAIL_FROM,
     to,
-    subject: `${otp} - Your CampusFace Verification Code`,
+    subject: `${otp} - Your Superior Connection Verification Code`,
     html
   });
 }

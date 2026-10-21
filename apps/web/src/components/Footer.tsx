@@ -1,96 +1,104 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Heart, Lock, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
+import { ShieldCheck, Lock } from 'lucide-react';
+import Superior from '@/assets/images/Superior.png';
+
+const PLATFORM_LINKS = [
+  { href: '/battle', label: 'Vote Battles' },
+  { href: '/leaderboard', label: 'University Leaderboard' },
+  { href: '/participant/consent', label: 'Contestant Consent Portal' },
+  { href: '/account', label: 'Privacy & Settings' },
+];
+
+const LEGAL_LINKS = [
+  { href: '/privacy', label: 'Privacy Policy & Data Rights' },
+  { href: '/terms', label: 'Terms of Participation' },
+  { href: '/guidelines', label: 'Community Rules & Anti-Bullying' },
+  { href: '/participant/profile', label: 'Immediate Consent Revocation' },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-surface-300 border-t border-white/10 mt-auto py-12 text-sm text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <footer className="mt-auto w-full border-t border-gray-200 bg-white text-sm text-gray-600">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand Info */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-black tracking-wider uppercase gradient-text">
-                CAMPUS<span className="text-white">FACE</span>
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 leading-relaxed max-w-md">
-              A high-performance university beauty voting platform where students compare consenting peers side-by-side. Built with strict privacy standards, zero non-consensual media, anti-harassment safeguards, and immediate consent revocation workflows.
+          <div className="space-y-4 md:col-span-2">
+            <Link href="/" aria-label="Home" className="inline-block">
+              <Image
+                src={Superior}
+                alt="Superior"
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+            <p className="max-w-md text-xs leading-relaxed text-gray-600">
+              A high-performance university beauty voting platform where students compare
+              consenting peers side-by-side. Built with strict privacy standards, zero
+              non-consensual media, anti-harassment safeguards, and immediate consent
+              revocation workflows.
             </p>
-            <div className="flex items-center space-x-4 text-xs text-gray-400 pt-2">
-              <span className="flex items-center space-x-1 text-emerald-400">
-                <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center space-x-4 pt-2 text-xs text-[#6C1C74]">
+              <span className="flex items-center space-x-1">
+                <ShieldCheck className="h-4 w-4" />
                 <span>100% Consenting Participants</span>
               </span>
-              <span className="flex items-center space-x-1 text-brand-cyan">
-                <Lock className="w-4 h-4" />
-                <span>Encrypted & Audited</span>
+              <span className="flex items-center space-x-1">
+                <Lock className="h-4 w-4" />
+                <span>Encrypted &amp; Audited</span>
               </span>
             </div>
           </div>
 
           {/* Platform Links */}
           <div>
-            <h4 className="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Platform</h4>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#6C1C74]">
+              Platform
+            </h4>
             <ul className="space-y-2 text-xs">
-              <li>
-                <Link href="/battle" className="hover:text-brand-pink transition-colors">
-                  Vote Battles
-                </Link>
-              </li>
-              <li>
-                <Link href="/leaderboard" className="hover:text-brand-gold transition-colors">
-                  University Leaderboard
-                </Link>
-              </li>
-              <li>
-                <Link href="/participant/consent" className="hover:text-brand-cyan transition-colors">
-                  Contestant Consent Portal
-                </Link>
-              </li>
-              <li>
-                <Link href="/account" className="hover:text-white transition-colors">
-                  Privacy & Settings
-                </Link>
-              </li>
+              {PLATFORM_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-gray-600 transition-colors hover:text-[#6C1C74]"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Legal & Safety */}
           <div>
-            <h4 className="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Safety & Legal</h4>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#6C1C74]">
+              Safety &amp; Legal
+            </h4>
             <ul className="space-y-2 text-xs">
-              <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">
-                  Privacy Policy & Data Rights
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-white transition-colors">
-                  Terms of Participation
-                </Link>
-              </li>
-              <li>
-                <Link href="/guidelines" className="hover:text-white transition-colors">
-                  Community Rules & Anti-Bullying
-                </Link>
-              </li>
-              <li>
-                <Link href="/participant/profile" className="text-red-400 hover:text-red-300 transition-colors">
-                  Immediate Consent Revocation
-                </Link>
-              </li>
+              {LEGAL_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="text-gray-600 transition-colors hover:text-[#6C1C74]"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 space-y-4 sm:space-y-0">
-          <p>© {new Date().getFullYear()} CampusFace. All rights reserved. Strictly for university community entertainment.</p>
-          <div className="flex items-center space-x-2">
-            <span>Powered by Next.js, Fastify & PostgreSQL</span>
-          </div>
+        <div className="flex flex-col items-center justify-between space-y-4 border-t border-gray-200 pt-8 text-xs text-gray-500 sm:flex-row sm:space-y-0">
+          <p>
+            &copy; {new Date().getFullYear()} Superior Connection. All rights reserved. Strictly for
+            university community entertainment.
+          </p>
+          <p>Powered by Next.js, Fastify &amp; PostgreSQL</p>
         </div>
       </div>
     </footer>
   );
 }
+
+export default Footer;

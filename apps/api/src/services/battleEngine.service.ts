@@ -46,22 +46,34 @@ export class BattleEngineService {
 
     if (eligibleBattles.length > 0) {
       const selected = eligibleBattles[0];
+      const [aggA, aggB] = await Promise.all([
+        prisma.leaderboardAggregate.findUnique({ where: { studentId: selected.contestantA.id } }),
+        prisma.leaderboardAggregate.findUnique({ where: { studentId: selected.contestantB.id } })
+      ]);
+      const votesA = aggA?.totalVotes ?? 0;
+      const votesB = aggB?.totalVotes ?? 0;
+
       return {
         battle: {
           id: selected.id,
           status: selected.status as any,
           createdAt: selected.createdAt.toISOString(),
+          votesA,
+          votesB,
+          totalVotes: votesA + votesB,
           contestantA: {
             id: selected.contestantA.id,
             displayName: selected.contestantA.displayName,
             department: selected.contestantA.department,
-            imageUrl: selected.contestantA.imageUrl || `/api/v1/media/${selected.contestantA.imageStorageKey}`
+            imageUrl: selected.contestantA.imageUrl || `/api/v1/media/${selected.contestantA.imageStorageKey}`,
+            votes: votesA
           },
           contestantB: {
             id: selected.contestantB.id,
             displayName: selected.contestantB.displayName,
             department: selected.contestantB.department,
-            imageUrl: selected.contestantB.imageUrl || `/api/v1/media/${selected.contestantB.imageStorageKey}`
+            imageUrl: selected.contestantB.imageUrl || `/api/v1/media/${selected.contestantB.imageStorageKey}`,
+            votes: votesB
           }
         },
         totalAvailable: eligibleBattles.length
@@ -132,39 +144,64 @@ export class BattleEngineService {
             }
           });
 
+          // Fetch actual lifetime votes for dynamic pair (matches Admin Dashboard & Leaderboard)
+          const [aggA, aggB] = await Promise.all([
+            prisma.leaderboardAggregate.findUnique({ where: { studentId: studentA.id } }),
+            prisma.leaderboardAggregate.findUnique({ where: { studentId: studentB.id } })
+          ]);
+          const votesA = aggA?.totalVotes ?? 0;
+          const votesB = aggB?.totalVotes ?? 0;
+
           return {
             id: newBattle.id,
             status: newBattle.status as any,
             createdAt: newBattle.createdAt.toISOString(),
+            votesA,
+            votesB,
+            totalVotes: votesA + votesB,
             contestantA: {
               id: studentA.id,
               displayName: studentA.displayName,
               department: studentA.department,
-              imageUrl: studentA.imageUrl || `/api/v1/media/${studentA.imageStorageKey}`
+              imageUrl: studentA.imageUrl || `/api/v1/media/${studentA.imageStorageKey}`,
+              votes: votesA
             },
             contestantB: {
               id: studentB.id,
               displayName: studentB.displayName,
               department: studentB.department,
-              imageUrl: studentB.imageUrl || `/api/v1/media/${studentB.imageStorageKey}`
+              imageUrl: studentB.imageUrl || `/api/v1/media/${studentB.imageStorageKey}`,
+              votes: votesB
             }
           };
         } else if (!votedBattleIds.includes(existingBattle.id) && existingBattle.status === BattleStatus.ACTIVE) {
+          const [aggA, aggB] = await Promise.all([
+            prisma.leaderboardAggregate.findUnique({ where: { studentId: studentA.id } }),
+            prisma.leaderboardAggregate.findUnique({ where: { studentId: studentB.id } })
+          ]);
+          const votesA = aggA?.totalVotes ?? 0;
+          const votesB = aggB?.totalVotes ?? 0;
+
           return {
             id: existingBattle.id,
             status: existingBattle.status as any,
             createdAt: existingBattle.createdAt.toISOString(),
+            votesA,
+            votesB,
+            totalVotes: votesA + votesB,
             contestantA: {
               id: studentA.id,
               displayName: studentA.displayName,
               department: studentA.department,
-              imageUrl: studentA.imageUrl || `/api/v1/media/${studentA.imageStorageKey}`
+              imageUrl: studentA.imageUrl || `/api/v1/media/${studentA.imageStorageKey}`,
+              votes: votesA
             },
             contestantB: {
               id: studentB.id,
               displayName: studentB.displayName,
               department: studentB.department,
-              imageUrl: studentB.imageUrl || `/api/v1/media/${studentB.imageStorageKey}`
+              imageUrl: studentB.imageUrl || `/api/v1/media/${studentB.imageStorageKey}`,
+              votes: votesB
             }
           };
         }

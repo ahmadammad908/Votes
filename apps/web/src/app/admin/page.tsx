@@ -4,14 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { apiClient, getImageUrl } from '@/lib/api';
-import { 
-  ShieldAlert, 
-  Users, 
-  Flame, 
-  MessageSquare, 
-  RefreshCw, 
-  Check, 
-  X, 
+import {
+  ShieldAlert,
+  RefreshCw,
   AlertTriangle,
   Flag,
   CheckCircle2
@@ -84,180 +79,211 @@ export default function AdminDashboardPage() {
 
   if (!user || (user.role !== 'ADMIN' && user.role !== 'MODERATOR')) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <ShieldAlert className="w-12 h-12 text-red-400 mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">Restricted Access</h2>
-        <p className="text-xs text-gray-400">You need administrative permissions to view this dashboard.</p>
+      <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 text-center">
+        <ShieldAlert className="mb-4 h-12 w-12 text-red-500" />
+        <h2 className="mb-2 text-xl font-bold text-[#6C1C74]">Restricted Access</h2>
+        <p className="text-xs text-gray-500">You need administrative permissions to view this dashboard.</p>
       </div>
     );
   }
 
+  const metricCards = metrics
+    ? [
+        { label: 'Users', value: metrics.totalUsers, color: 'text-gray-900' },
+        { label: 'Contestants', value: metrics.totalStudents, color: 'text-[#6C1C74]' },
+        { label: 'Active Battles', value: metrics.activeBattles, color: 'text-[#6C1C74]' },
+        { label: 'Total Votes', value: metrics.totalVotes, color: 'text-[#6C1C74]' },
+        { label: 'Pending Reports', value: metrics.pendingReports, color: 'text-red-600' },
+        { label: 'Flagged Comments', value: metrics.flaggedComments, color: 'text-amber-600' }
+      ]
+    : [];
+
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-10">
+    <div className="mx-auto w-full max-w-6xl bg-white px-4 py-10 text-gray-900">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="inline-flex items-center space-x-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
-            <ShieldAlert className="w-4 h-4" />
+          <div className="mb-1 inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-[#6C1C74]">
+            <ShieldAlert className="h-4 w-4" />
             <span>Administrative Control Center</span>
           </div>
-          <h1 className="text-3xl font-black text-white">CampusFace Admin & Moderation</h1>
+          <h1 className="text-3xl font-black text-[#6C1C74]">Superior Connection Admin &amp; Moderation</h1>
         </div>
 
         <div className="flex items-center space-x-3">
           <Link
             href="/admin/reports"
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold transition-colors"
+            className="flex items-center space-x-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
           >
-            <Flag className="w-4 h-4" />
+            <Flag className="h-4 w-4" />
             <span>View Reports ({metrics?.pendingReports || 0})</span>
           </Link>
 
           <button
             onClick={handleReconcileLeaderboard}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-surface-100 hover:bg-surface-50 text-white border border-white/10 text-xs font-semibold transition-colors"
+            className="flex items-center space-x-2 rounded-xl bg-[#6C1C74] px-4 py-2 text-xs font-semibold text-white shadow-md shadow-[#6C1C74]/20 transition-opacity hover:opacity-90"
           >
-            <RefreshCw className="w-4 h-4 text-brand-gold" />
+            <RefreshCw className="h-4 w-4" />
             <span>Reconcile Votes</span>
           </button>
         </div>
       </div>
 
       {reconcileMessage && (
-        <div className="mb-6 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center space-x-2 text-xs text-emerald-300 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <div className="animate-fade-in mb-6 flex items-center space-x-2 rounded-xl border border-[#6C1C74]/25 bg-[#6C1C74]/5 p-3 text-xs text-[#6C1C74]">
+          <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
           <span>{reconcileMessage}</span>
         </div>
       )}
 
       {/* Metrics Cards */}
       {metrics && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-white">{metrics.totalUsers}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Users</span>
-          </div>
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-brand-pink">{metrics.totalStudents}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Contestants</span>
-          </div>
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-brand-purple">{metrics.activeBattles}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Active Battles</span>
-          </div>
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-brand-gold">{metrics.totalVotes}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Total Votes</span>
-          </div>
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-red-400">{metrics.pendingReports}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Pending Reports</span>
-          </div>
-          <div className="p-4 rounded-2xl glass-panel text-center">
-            <span className="text-2xl font-black text-amber-400">{metrics.flaggedComments}</span>
-            <span className="text-[11px] text-gray-400 block mt-1">Flagged Comments</span>
-          </div>
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7">
+          {metricCards.map((m) => (
+            <div
+              key={m.label}
+              className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm"
+            >
+              <span className={`text-2xl font-black ${m.color}`}>{m.value}</span>
+              <span className="mt-1 block text-[11px] text-gray-500">{m.label}</span>
+            </div>
+          ))}
+
           {/* Pending Approvals — highlighted */}
-          <div className={`p-4 rounded-2xl text-center border-2 ${
-            metrics.pendingApprovals > 0
-              ? 'bg-amber-950/40 border-amber-500/60 animate-pulse'
-              : 'glass-panel border-white/10'
-          }`}>
-            <span className={`text-2xl font-black ${metrics.pendingApprovals > 0 ? 'text-amber-400' : 'text-gray-500'}`}>
+          <div
+            className={`rounded-2xl border-2 p-4 text-center ${
+              metrics.pendingApprovals > 0
+                ? 'animate-pulse border-[#6C1C74] bg-[#6C1C74]/10'
+                : 'border-gray-200 bg-white shadow-sm'
+            }`}
+          >
+            <span
+              className={`text-2xl font-black ${
+                metrics.pendingApprovals > 0 ? 'text-[#6C1C74]' : 'text-gray-400'
+              }`}
+            >
               {metrics.pendingApprovals}
             </span>
-            <span className="text-[11px] text-amber-300 block mt-1">⏳ Pending</span>
+            <span className="mt-1 block text-[11px] font-medium text-[#6C1C74]">⏳ Pending</span>
           </div>
         </div>
       )}
 
       {/* Pending Approvals Alert Banner */}
       {metrics && metrics.pendingApprovals > 0 && (
-        <div className="mb-6 p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center space-x-3 animate-fade-in">
-          <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+        <div className="animate-fade-in mb-6 flex items-center space-x-3 rounded-2xl border border-[#6C1C74]/30 bg-[#6C1C74]/5 p-4">
+          <AlertTriangle className="h-5 w-5 flex-shrink-0 text-[#6C1C74]" />
           <div>
-            <p className="text-sm font-bold text-amber-300">
+            <p className="text-sm font-bold text-[#6C1C74]">
               {metrics.pendingApprovals} contestant profile{metrics.pendingApprovals > 1 ? 's' : ''} awaiting your approval
             </p>
-            <p className="text-xs text-amber-400/70 mt-0.5">
+            <p className="mt-0.5 text-xs text-gray-600">
               These profiles are hidden from public battles until you approve them below.
             </p>
           </div>
         </div>
       )}
 
-
       {/* Student Contestants Management Queue */}
-      <div className="glass-panel rounded-3xl border border-white/10 p-6">
-        <h3 className="text-lg font-bold text-white mb-4">Contestant Verification & Listing Queue</h3>
-        {isLoading ? (
-          <div className="py-12 text-center text-xs text-gray-400">Loading student queue...</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-gray-300">
-              <thead className="bg-surface-200/60 text-gray-400 uppercase text-[10px] tracking-wider">
-                <tr>
-                  <th className="p-3 rounded-l-lg">Contestant</th>
-                  <th className="p-3">Department</th>
-                  <th className="p-3">Consent Status</th>
-                  <th className="p-3">Profile Status</th>
-                  <th className="p-3">Votes</th>
-                  <th className="p-3 rounded-r-lg text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {students.map((s) => (
-                  <tr key={s.id} className="hover:bg-surface-100/40">
-                    <td className="p-3 flex items-center space-x-3">
-                      <img
-                        src={getImageUrl(s.imageUrl)}
-                        alt={s.displayName}
-                        className="w-9 h-9 rounded-lg object-cover bg-surface-200"
-                      />
-                      <span className="font-bold text-white">{s.displayName}</span>
-                    </td>
-                    <td className="p-3">{s.department || '—'}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        s.consentStatus === 'ACTIVE' ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30' : 'bg-red-950 text-red-400'
-                      }`}>
-                        {s.consentStatus}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        s.profileStatus === 'APPROVED' ? 'bg-cyan-950 text-brand-cyan border border-brand-cyan/30' : 'bg-amber-950 text-amber-400'
-                      }`}>
-                        {s.profileStatus}
-                      </span>
-                    </td>
-                    <td className="p-3 font-semibold text-white">{s.totalVotes || 0}</td>
-                    <td className="p-3 text-right space-x-2">
-                      {s.profileStatus !== 'APPROVED' && (
-                        <button
-                          onClick={() => handleUpdateStudentStatus(s.id, 'APPROVED')}
-                          className="px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold"
-                          title="Approve profile"
-                        >
-                          Approve
-                        </button>
-                      )}
-                      {s.profileStatus !== 'SUSPENDED' && (
-                        <button
-                          onClick={() => handleUpdateStudentStatus(s.id, 'SUSPENDED')}
-                          className="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold"
-                          title="Suspend profile"
-                        >
-                          Suspend
-                        </button>
-                      )}
-                    </td>
+      <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl shadow-[#6C1C74]/10">
+        <div className="h-1.5 w-full bg-[#6C1C74]" />
+
+        <div className="p-6">
+          <h3 className="mb-4 text-lg font-bold text-[#6C1C74]">
+            Contestant Verification &amp; Listing Queue
+          </h3>
+
+          {isLoading ? (
+            <div className="py-12 text-center text-xs text-gray-500">Loading student queue...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-gray-700">
+                <thead className="bg-[#6C1C74]/5 text-[10px] uppercase tracking-wider text-[#6C1C74]">
+                  <tr>
+                    <th className="rounded-l-lg p-3">Contestant</th>
+                    <th className="p-3">Department</th>
+                    <th className="p-3">Consent Status</th>
+                    <th className="p-3">Profile Status</th>
+                    <th className="p-3">Votes</th>
+                    <th className="rounded-r-lg p-3 text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {students.map((s) => (
+                    <tr
+                      key={s.id}
+                      className={`transition-colors ${
+                        s.profileStatus === 'PENDING'
+                          ? 'bg-amber-50/50 hover:bg-amber-50'
+                          : 'hover:bg-[#6C1C74]/5'
+                      }`}
+                    >
+                      <td className="p-3">
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={getImageUrl(s.imageUrl)}
+                            alt={s.displayName}
+                            className="h-10 w-10 rounded-lg bg-gray-100 object-cover ring-1 ring-gray-200"
+                          />
+                          <div>
+                            <span className="font-bold text-gray-900 block">{s.displayName}</span>
+                            <span className="text-[10px] text-gray-500">{s.email || 'Student'}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3">{s.department || '—'}</td>
+                      <td className="p-3">
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                            s.consentStatus === 'ACTIVE'
+                              ? 'border border-[#6C1C74]/25 bg-[#6C1C74]/10 text-[#6C1C74]'
+                              : 'border border-red-200 bg-red-50 text-red-600'
+                          }`}
+                        >
+                          {s.consentStatus}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                            s.profileStatus === 'APPROVED'
+                              ? 'bg-[#6C1C74] text-white'
+                              : s.profileStatus === 'PENDING'
+                              ? 'border border-amber-300 bg-amber-100 text-amber-900 font-extrabold'
+                              : 'border border-gray-200 bg-gray-50 text-gray-700'
+                          }`}
+                        >
+                          {s.profileStatus === 'PENDING' ? '⏳ PENDING REVIEW' : s.profileStatus}
+                        </span>
+                      </td>
+                      <td className="p-3 font-semibold text-gray-900">{s.totalVotes || 0}</td>
+                      <td className="space-x-2 p-3 text-right">
+                        {s.profileStatus !== 'APPROVED' && (
+                          <button
+                            onClick={() => handleUpdateStudentStatus(s.id, 'APPROVED')}
+                            className="rounded-lg bg-emerald-600 px-3 py-1.5 font-bold text-white shadow-sm transition-opacity hover:opacity-90"
+                            title="Verify and approve contestant"
+                          >
+                            ✓ Verify &amp; Approve
+                          </button>
+                        )}
+                        {s.profileStatus !== 'SUSPENDED' && (
+                          <button
+                            onClick={() => handleUpdateStudentStatus(s.id, 'SUSPENDED')}
+                            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 font-semibold text-amber-700 transition-colors hover:bg-amber-100"
+                            title="Suspend profile"
+                          >
+                            Suspend
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -37,7 +37,9 @@ export const ConsentSchema = z.object({
   }),
   consentVersion: z.string().default(CURRENT_CONSENT_VERSION),
   displayName: z.string().min(2).max(50).trim().optional(),
-  department: z.string().max(100).optional().nullable()
+  department: z.string().max(100).optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  imageStorageKey: z.string().optional().nullable()
 });
 
 export const UpdateProfileSchema = z.object({

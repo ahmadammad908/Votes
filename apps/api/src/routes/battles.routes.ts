@@ -55,22 +55,34 @@ export async function battlesRoutes(app: FastifyInstance) {
       });
     }
 
+    const [aggA, aggB] = await Promise.all([
+      prisma.leaderboardAggregate.findUnique({ where: { studentId: battle.contestantA.id } }),
+      prisma.leaderboardAggregate.findUnique({ where: { studentId: battle.contestantB.id } })
+    ]);
+    const votesA = aggA?.totalVotes ?? 0;
+    const votesB = aggB?.totalVotes ?? 0;
+
     return {
       battle: {
         id: battle.id,
         status: battle.status,
         createdAt: battle.createdAt.toISOString(),
+        votesA,
+        votesB,
+        totalVotes: votesA + votesB,
         contestantA: {
           id: battle.contestantA.id,
           displayName: battle.contestantA.displayName,
           department: battle.contestantA.department,
-          imageUrl: battle.contestantA.imageUrl || `/api/v1/media/${battle.contestantA.imageStorageKey}`
+          imageUrl: battle.contestantA.imageUrl || `/api/v1/media/${battle.contestantA.imageStorageKey}`,
+          votes: votesA
         },
         contestantB: {
           id: battle.contestantB.id,
           displayName: battle.contestantB.displayName,
           department: battle.contestantB.department,
-          imageUrl: battle.contestantB.imageUrl || `/api/v1/media/${battle.contestantB.imageStorageKey}`
+          imageUrl: battle.contestantB.imageUrl || `/api/v1/media/${battle.contestantB.imageStorageKey}`,
+          votes: votesB
         }
       }
     };

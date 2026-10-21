@@ -117,12 +117,22 @@ export class VotingService {
     // Invalidate cached leaderboard
     await cache.del('campusface:leaderboard');
 
+    const [aggA, aggB] = await Promise.all([
+      prisma.leaderboardAggregate.findUnique({ where: { studentId: battle.contestantAId } }),
+      prisma.leaderboardAggregate.findUnique({ where: { studentId: battle.contestantBId } })
+    ]);
+    const votesA = aggA?.totalVotes ?? 0;
+    const votesB = aggB?.totalVotes ?? 0;
+
     return {
       success: true,
       voteId: result.id,
       battleId: result.battleId,
       selectedStudentId: result.selectedStudentId,
-      message: 'Vote registered successfully'
+      message: 'Vote registered successfully',
+      votesA,
+      votesB,
+      totalVotes: votesA + votesB
     };
   }
 }

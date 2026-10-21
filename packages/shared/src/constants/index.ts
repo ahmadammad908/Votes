@@ -1,11 +1,11 @@
 export const CURRENT_CONSENT_VERSION = 'v1.0';
 
 export const CONSENT_TERMS_TEXT = `
-CAMPUSFACE PARTICIPANT CONSENT AND PRIVACY AGREEMENT (VERSION 1.0)
+SUPERIOR CONNECTION PARTICIPANT CONSENT AND PRIVACY AGREEMENT (VERSION 1.0)
 
-1. EXPLICIT CONSENT: By consenting, you explicitly authorize CampusFace to display your submitted photograph, chosen display name, and department for university community voting battles.
+1. EXPLICIT CONSENT: By consenting, you explicitly authorize Superior Connection to display your submitted photograph, chosen display name, and department for university community voting battles.
 2. RIGHT TO WITHDRAW: You retain the absolute right to withdraw your consent at any time through your account settings or profile page. Upon withdrawal, your profile and photo will be immediately and irrevocably delisted from all active and future battles.
-3. DATA PROTECTION: CampusFace will never sell, transfer, or distribute your photographs to third parties. Photographs are used solely for pairwise on-platform voting.
+3. DATA PROTECTION: Superior Connection will never sell, transfer, or distribute your photographs to third parties. Photographs are used solely for pairwise on-platform voting.
 4. NO HARASSMENT TOLERANCE: Any derogatory, abusive, non-consensual sexual, or bullying comments targeting participants are strictly forbidden and subject to automated filtering and immediate administrative removal.
 5. NO SCRAPED MEDIA: All contestant photographs must be directly uploaded by the verified student account owner.
 `.trim();

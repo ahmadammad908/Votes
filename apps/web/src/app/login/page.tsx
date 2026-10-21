@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { apiClient } from '@/lib/api';
-import { Flame, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
+import Logo from '@/assets/images/logo.png';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,76 +39,101 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-md bg-surface-100/90 border border-white/10 rounded-3xl p-8 glass-panel shadow-2xl animate-fade-in">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-pink/20 text-brand-pink mb-3">
-            <Flame className="w-6 h-6 fill-brand-pink" />
-          </div>
-          <h1 className="text-2xl font-black text-white">Welcome Back</h1>
-          <p className="text-xs text-gray-400 mt-1">Sign in with your university account to vote</p>
-        </div>
+    <div className="flex flex-1 items-center justify-center bg-gradient-to-b from-[#6C1C74]/5 to-white p-4 py-12">
+      <div className="animate-fade-in w-full max-w-md overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl shadow-[#6C1C74]/10">
+        {/* Top accent */}
+        <div className="h-1.5 w-full bg-[#6C1C74]" />
 
-        {errorMessage && (
-          <div className="mb-6 p-3 rounded-xl bg-red-950/40 border border-red-500/30 flex items-center space-x-2 text-xs text-red-300">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">University Email</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@campusface.edu"
-                className="w-full pl-10 pr-4 py-3 bg-surface-200 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-pink"
+        <div className="p-8">
+          <div className="mb-8 text-center">
+            <div className="mb-4 flex justify-center">
+              <Image
+                src={Logo}
+                alt="Logo"
+                priority
+                className="h-16 w-auto object-contain"
               />
             </div>
+            <h1 className="text-2xl font-black text-[#6C1C74]">Welcome Back</h1>
+            <p className="mt-1 text-xs text-gray-500">Sign in with your university account to vote</p>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Password</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 bg-surface-200 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-pink"
-              />
+          {errorMessage && (
+            <div
+              role="alert"
+              className="mb-6 flex items-center space-x-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700"
+            >
+              <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-500" />
+              <span>{errorMessage}</span>
             </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="mb-1 block text-xs font-semibold text-gray-700">
+                University Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6C1C74]/60" />
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="student@superior.edu"
+                  className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-[#6C1C74] focus:outline-none focus:ring-1 focus:ring-[#6C1C74]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-1 block text-xs font-semibold text-gray-700">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6C1C74]/60" />
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-[#6C1C74] focus:outline-none focus:ring-1 focus:ring-[#6C1C74]"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-2 flex w-full items-center justify-center space-x-2 rounded-xl bg-[#6C1C74] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#6C1C74]/25 transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+            >
+              <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+
+          <div className="mt-6 border-t border-gray-200 pt-6 text-center text-xs text-gray-500">
+            Don&apos;t have an account yet?{' '}
+            <Link href="/register" className="font-semibold text-[#6C1C74] hover:underline">
+              Register here
+            </Link>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3.5 mt-2 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 active:scale-98 shadow-lg shadow-brand-pink/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-          >
-            <span>{isLoading ? 'Signing in...' : 'Sign In'}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-white/10 text-center text-xs text-gray-400">
-          Don&apos;t have an account yet?{' '}
-          <Link href="/register" className="font-semibold text-brand-pink hover:underline">
-            Register here
-          </Link>
-        </div>
-
-        {/* Demo Credentials Helper */}
-        <div className="mt-4 p-3 bg-surface-200/50 rounded-xl border border-white/5 text-[11px] text-gray-400">
-          <p className="font-semibold text-gray-300 mb-1">Demo Credentials:</p>
-          <p>Admin: <code className="text-brand-cyan">admin@campusface.edu</code> / <code className="text-brand-pink">CampusFace2026!</code></p>
-          <p>Voter: <code className="text-brand-cyan">student.voter@campusface.edu</code> / <code className="text-brand-pink">CampusFace2026!</code></p>
+          {/* Demo Credentials Helper */}
+          <div className="mt-4 rounded-xl border border-[#6C1C74]/15 bg-[#6C1C74]/5 p-3 text-[11px] text-gray-600">
+            <p className="mb-1 font-semibold text-[#6C1C74]">Demo Credentials:</p>
+            <p>
+              Admin: <code className="font-semibold text-gray-900">admin@superior.edu</code> /{' '}
+              <code className="font-semibold text-[#6C1C74]">Superior2026!</code>
+            </p>
+            <p>
+              Voter: <code className="font-semibold text-gray-900">student.voter@superior.edu</code> /{' '}
+              <code className="font-semibold text-[#6C1C74]">Superior2026!</code>
+            </p>
+          </div>
         </div>
       </div>
     </div>

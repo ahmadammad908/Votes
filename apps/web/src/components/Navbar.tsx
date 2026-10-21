@@ -2,19 +2,20 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { 
-  Flame, 
-  Trophy, 
-  User as UserIcon, 
-  ShieldCheck, 
-  LogOut, 
-  Menu, 
-  X, 
+import {
+  Flame,
+  Trophy,
+  User as UserIcon,
+  LogOut,
+  Menu,
+  X,
   Sparkles,
-  ShieldAlert
+  ShieldAlert,
 } from 'lucide-react';
+import Superior from '@/assets/images/Superior.png';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -23,69 +24,60 @@ export function Navbar() {
 
   const isActive = (path: string) => pathname === path;
 
+  const linkBase =
+    'flex items-center space-x-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors border';
+  const linkActive = 'bg-[#6C1C74]/10 text-[#6C1C74] border-[#6C1C74]/30';
+  const linkIdle =
+    'text-gray-700 border-transparent hover:text-[#6C1C74] hover:bg-[#6C1C74]/5';
+
   return (
-    <nav className="sticky top-0 z-50 glass-panel border-b border-white/10 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-pink via-brand-purple to-brand-cyan p-[1.5px] group-hover:scale-105 transition-transform duration-200">
-              <div className="w-full h-full bg-surface-200 rounded-[10px] flex items-center justify-center">
-                <Flame className="w-5 h-5 text-brand-pink fill-brand-pink group-hover:text-brand-gold transition-colors" />
-              </div>
-            </div>
-            <div>
-              <span className="text-xl font-black tracking-wider uppercase gradient-text">
-                CAMPUS<span className="text-white">FACE</span>
-              </span>
-              <span className="hidden sm:inline-block text-[10px] font-semibold text-gray-400 ml-2 px-1.5 py-0.5 rounded bg-surface-100 border border-white/5">
-                BEAUTY VOTE
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group" aria-label="Home">
+            <Image
+              src={Superior}
+              alt="Superior"
+              priority
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
+            />
           </Link>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-1">
             <Link
               href="/battle"
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive('/battle')
-                  ? 'bg-brand-purple/20 text-brand-pink border border-brand-pink/30'
-                  : 'text-gray-300 hover:text-white hover:bg-surface-100'
-              }`}
+              className={`${linkBase} ${isActive('/battle') ? linkActive : linkIdle}`}
             >
-              <Flame className="w-4 h-4 text-brand-pink" />
+              <Flame className="w-4 h-4 text-[#6C1C74]" />
               <span>Vote Battles</span>
             </Link>
 
             <Link
               href="/leaderboard"
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive('/leaderboard')
-                  ? 'bg-brand-purple/20 text-brand-gold border border-brand-gold/30'
-                  : 'text-gray-300 hover:text-white hover:bg-surface-100'
-              }`}
+              className={`${linkBase} ${isActive('/leaderboard') ? linkActive : linkIdle}`}
             >
-              <Trophy className="w-4 h-4 text-brand-gold" />
+              <Trophy className="w-4 h-4 text-[#6C1C74]" />
               <span>Leaderboard</span>
             </Link>
 
             <Link
               href="/participant/consent"
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`${linkBase} ${
                 isActive('/participant/consent') || isActive('/participant/profile')
-                  ? 'bg-brand-purple/20 text-brand-cyan border border-brand-cyan/30'
-                  : 'text-gray-300 hover:text-white hover:bg-surface-100'
+                  ? linkActive
+                  : linkIdle
               }`}
             >
-              <Sparkles className="w-4 h-4 text-brand-cyan" />
+              <Sparkles className="w-4 h-4 text-[#6C1C74]" />
               <span>Join as Contestant</span>
             </Link>
 
             {user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
               <Link
                 href="/admin"
-                className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-sm font-medium text-amber-400 hover:bg-amber-400/10 border border-amber-400/20 transition-colors`}
+                className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-sm font-medium text-[#6C1C74] hover:bg-[#6C1C74]/10 border border-[#6C1C74]/30 transition-colors"
               >
                 <ShieldAlert className="w-4 h-4" />
                 <span>Admin</span>
@@ -99,14 +91,16 @@ export function Navbar() {
               <div className="flex items-center space-x-3">
                 <Link
                   href="/account"
-                  className="flex items-center space-x-2 text-sm text-gray-200 hover:text-white bg-surface-100 px-3 py-1.5 rounded-lg border border-white/10"
+                  className="flex items-center space-x-2 text-sm text-gray-800 hover:text-[#6C1C74] bg-white px-3 py-1.5 rounded-lg border border-gray-200 hover:border-[#6C1C74]/40 transition-colors"
                 >
-                  <UserIcon className="w-4 h-4 text-brand-purple" />
-                  <span className="font-medium truncate max-w-[120px]">{user.email.split('@')[0]}</span>
+                  <UserIcon className="w-4 h-4 text-[#6C1C74]" />
+                  <span className="font-medium truncate max-w-[120px]">
+                    {user.email.split('@')[0]}
+                  </span>
                 </Link>
                 <button
                   onClick={() => logout()}
-                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-surface-100 rounded-lg transition-colors"
+                  className="p-2 text-gray-500 hover:text-red-500 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Logout"
                 >
                   <LogOut className="w-4 h-4" />
@@ -116,13 +110,13 @@ export function Navbar() {
               <div className="flex items-center space-x-2">
                 <Link
                   href="/login"
-                  className="px-3.5 py-1.5 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  className="px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:text-[#6C1C74] transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 rounded-lg shadow-lg shadow-brand-pink/20 transition-all duration-200"
+                  className="px-4 py-1.5 text-sm font-semibold text-white bg-[#6C1C74] hover:opacity-90 rounded-lg shadow-md shadow-[#6C1C74]/20 transition-all duration-200"
                 >
                   Register
                 </Link>
@@ -134,7 +128,7 @@ export function Navbar() {
           <div className="flex md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-surface-100"
+              className="p-2 rounded-lg text-gray-600 hover:text-[#6C1C74] hover:bg-[#6C1C74]/5"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -145,29 +139,29 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-surface-200 border-b border-white/10 px-4 pt-2 pb-6 space-y-2 animate-fade-in">
+        <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-6 space-y-2 animate-fade-in">
           <Link
             href="/battle"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-200 hover:bg-surface-100"
+            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-800 hover:bg-[#6C1C74]/5"
           >
-            <Flame className="w-5 h-5 text-brand-pink" />
+            <Flame className="w-5 h-5 text-[#6C1C74]" />
             <span>Vote Battles</span>
           </Link>
           <Link
             href="/leaderboard"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-200 hover:bg-surface-100"
+            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-800 hover:bg-[#6C1C74]/5"
           >
-            <Trophy className="w-5 h-5 text-brand-gold" />
+            <Trophy className="w-5 h-5 text-[#6C1C74]" />
             <span>Leaderboard</span>
           </Link>
           <Link
             href="/participant/consent"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-200 hover:bg-surface-100"
+            className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-800 hover:bg-[#6C1C74]/5"
           >
-            <Sparkles className="w-5 h-5 text-brand-cyan" />
+            <Sparkles className="w-5 h-5 text-[#6C1C74]" />
             <span>Join as Contestant</span>
           </Link>
 
@@ -175,22 +169,22 @@ export function Navbar() {
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-amber-400 hover:bg-surface-100"
+              className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-[#6C1C74] hover:bg-[#6C1C74]/5"
             >
               <ShieldAlert className="w-5 h-5" />
               <span>Admin Moderation</span>
             </Link>
           )}
 
-          <div className="pt-4 border-t border-white/10">
+          <div className="pt-4 border-t border-gray-200">
             {user ? (
               <div className="space-y-2">
                 <Link
                   href="/account"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-200 hover:bg-surface-100"
+                  className="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-gray-800 hover:bg-[#6C1C74]/5"
                 >
-                  <UserIcon className="w-5 h-5 text-brand-purple" />
+                  <UserIcon className="w-5 h-5 text-[#6C1C74]" />
                   <span>My Account ({user.email})</span>
                 </Link>
                 <button
@@ -198,7 +192,7 @@ export function Navbar() {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-red-400 hover:bg-surface-100 text-left"
+                  className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-base font-medium text-red-500 hover:bg-red-50 text-left"
                 >
                   <LogOut className="w-5 h-5" />
                   <span>Sign Out</span>
@@ -209,14 +203,14 @@ export function Navbar() {
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-lg text-sm font-medium text-gray-200 bg-surface-100 hover:bg-surface-50"
+                  className="w-full text-center py-2.5 rounded-lg text-sm font-medium text-[#6C1C74] border border-[#6C1C74]/30 hover:bg-[#6C1C74]/5"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-brand-pink to-brand-purple"
+                  className="w-full text-center py-2.5 rounded-lg text-sm font-semibold text-white bg-[#6C1C74] hover:opacity-90"
                 >
                   Register
                 </Link>

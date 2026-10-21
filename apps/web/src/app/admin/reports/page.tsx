@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { apiClient } from '@/lib/api';
-import { ShieldAlert, Flag, CheckCircle2, XCircle, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, ArrowLeft } from 'lucide-react';
 import { ReportDTO } from '@campusface/shared';
 
 export default function AdminReportsPage() {
@@ -66,27 +66,40 @@ export default function AdminReportsPage() {
     }
   };
 
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'MODERATOR')) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 text-center">
+        <ShieldAlert className="mb-4 h-12 w-12 text-red-500" />
+        <h2 className="mb-2 text-xl font-bold text-[#6C1C74]">Restricted Access</h2>
+        <p className="text-xs text-gray-500">You need administrative permissions to view this page.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-10">
+    <div className="mx-auto w-full max-w-6xl bg-white px-4 py-10 text-gray-900">
       {/* Back button */}
       <Link
         href="/admin"
-        className="inline-flex items-center space-x-1.5 text-xs font-semibold text-gray-400 hover:text-white mb-6"
+        className="mb-6 inline-flex items-center space-x-1.5 text-xs font-semibold text-gray-500 transition-colors hover:text-[#6C1C74]"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="h-4 w-4" />
         <span>Back to Admin Dashboard</span>
       </Link>
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-black text-white">Community Moderation & Abuse Reports</h1>
-          <p className="text-xs text-gray-400 mt-1">Review flagged comments, contestant reports, and abuse incidents.</p>
+          <h1 className="text-2xl font-black text-[#6C1C74]">Community Moderation &amp; Abuse Reports</h1>
+          <p className="mt-1 text-xs text-gray-500">
+            Review flagged comments, contestant reports, and abuse incidents.
+          </p>
         </div>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="px-3 py-2 bg-surface-100 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-red-500"
+          aria-label="Filter reports"
+          className="rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 focus:border-[#6C1C74] focus:outline-none focus:ring-1 focus:ring-[#6C1C74]"
         >
           <option value="PENDING">Pending Reports Only</option>
           <option value="RESOLVED">Resolved Reports</option>
@@ -94,78 +107,89 @@ export default function AdminReportsPage() {
         </select>
       </div>
 
-      <div className="glass-panel rounded-3xl border border-white/10 p-6">
-        {isLoading ? (
-          <div className="py-12 text-center text-xs text-gray-400">Loading reports queue...</div>
-        ) : reports.length === 0 ? (
-          <div className="py-12 text-center text-xs text-gray-400">No reports found in this queue.</div>
-        ) : (
-          <div className="space-y-4">
-            {reports.map((report) => (
-              <div
-                key={report.id}
-                className="p-5 rounded-2xl bg-surface-200/60 border border-white/5 space-y-3"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-400 border border-red-500/30">
-                      {report.targetType} REPORT
+      <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl shadow-[#6C1C74]/10">
+        {/* Top accent */}
+        <div className="h-1.5 w-full bg-[#6C1C74]" />
+
+        <div className="p-6">
+          {isLoading ? (
+            <div className="py-12 text-center text-xs text-gray-500">Loading reports queue...</div>
+          ) : reports.length === 0 ? (
+            <div className="py-12 text-center text-xs text-gray-500">No reports found in this queue.</div>
+          ) : (
+            <div className="space-y-4">
+              {reports.map((report) => (
+                <div
+                  key={report.id}
+                  className="space-y-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <span className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[10px] font-bold text-red-600">
+                        {report.targetType} REPORT
+                      </span>
+                      <span className="text-gray-300">•</span>
+                      <span className="text-gray-500">{new Date(report.createdAt).toLocaleString()}</span>
+                    </div>
+
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                        report.status === 'PENDING'
+                          ? 'border border-amber-200 bg-amber-50 text-amber-700'
+                          : 'border border-[#6C1C74]/25 bg-[#6C1C74]/10 text-[#6C1C74]'
+                      }`}
+                    >
+                      {report.status}
                     </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-400">{new Date(report.createdAt).toLocaleString()}</span>
                   </div>
 
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    report.status === 'PENDING' ? 'bg-amber-950 text-amber-400' : 'bg-emerald-950 text-emerald-400'
-                  }`}>
-                    {report.status}
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold text-white">Reason:</p>
-                  <p className="text-xs text-gray-300 mt-0.5 leading-relaxed bg-surface-100 p-2.5 rounded-lg border border-white/5">
-                    {report.reason}
-                  </p>
-                  <p className="text-[11px] text-gray-500 mt-1">Target ID: <code>{report.targetId}</code></p>
-                </div>
-
-                {report.status === 'PENDING' && (
-                  <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-white/5">
-                    {report.targetType === 'COMMENT' && (
-                      <button
-                        onClick={() => handleResolve(report.id, 'REMOVE_CONTENT')}
-                        className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs transition-colors"
-                      >
-                        Remove Comment
-                      </button>
-                    )}
-                    {report.targetType === 'STUDENT' && (
-                      <button
-                        onClick={() => handleResolve(report.id, 'SUSPEND_STUDENT')}
-                        className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors"
-                      >
-                        Suspend Student
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleResolve(report.id, 'NONE')}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors"
-                    >
-                      Resolve (No Action Needed)
-                    </button>
-                    <button
-                      onClick={() => handleDismiss(report.id)}
-                      className="px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-surface-50 text-gray-300 font-semibold text-xs transition-colors border border-white/10"
-                    >
-                      Dismiss Report
-                    </button>
+                  <div>
+                    <p className="text-xs font-semibold text-[#6C1C74]">Reason:</p>
+                    <p className="mt-0.5 rounded-lg border border-gray-200 bg-gray-50 p-2.5 text-xs leading-relaxed text-gray-700">
+                      {report.reason}
+                    </p>
+                    <p className="mt-1 text-[11px] text-gray-400">
+                      Target ID: <code className="text-gray-600">{report.targetId}</code>
+                    </p>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+
+                  {report.status === 'PENDING' && (
+                    <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
+                      {report.targetType === 'COMMENT' && (
+                        <button
+                          onClick={() => handleResolve(report.id, 'REMOVE_CONTENT')}
+                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700"
+                        >
+                          Remove Comment
+                        </button>
+                      )}
+                      {report.targetType === 'STUDENT' && (
+                        <button
+                          onClick={() => handleResolve(report.id, 'SUSPEND_STUDENT')}
+                          className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-amber-600"
+                        >
+                          Suspend Student
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleResolve(report.id, 'NONE')}
+                        className="rounded-lg bg-[#6C1C74] px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                      >
+                        Resolve (No Action Needed)
+                      </button>
+                      <button
+                        onClick={() => handleDismiss(report.id)}
+                        className="rounded-lg border border-[#6C1C74]/30 bg-white px-3 py-1.5 text-xs font-semibold text-[#6C1C74] transition-colors hover:bg-[#6C1C74]/5"
+                      >
+                        Dismiss Report
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

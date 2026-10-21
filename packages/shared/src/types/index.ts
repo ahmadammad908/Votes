@@ -18,6 +18,7 @@ export interface UserDTO {
 export interface StudentProfileDTO {
   id: string;
   userId?: string | null;
+  email?: string | null;
   displayName: string;
   department: string | null;
   imageUrl: string;
@@ -34,12 +35,16 @@ export interface ContestantSummaryDTO {
   displayName: string;
   department: string | null;
   imageUrl: string;
+  votes?: number;
 }
 
 export interface BattleDTO {
   id: string;
   contestantA: ContestantSummaryDTO;
   contestantB: ContestantSummaryDTO;
+  votesA?: number;
+  votesB?: number;
+  totalVotes?: number;
   status: BattleStatus;
   createdAt: string;
 }
@@ -62,6 +67,9 @@ export interface VoteResponseDTO {
   battleId: string;
   selectedStudentId: string;
   message: string;
+  votesA?: number;
+  votesB?: number;
+  totalVotes?: number;
 }
 
 export interface CommentDTO {

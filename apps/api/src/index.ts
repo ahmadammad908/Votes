@@ -9,9 +9,9 @@ async function start() {
       host: '0.0.0.0'
     });
 
-    app.log.info(`🚀 CampusFace API server running at ${address}`);
+    app.log.info(`🚀 Superior Connection API server running at ${address}`);
   } catch (err) {
-    console.error('❌ Failed to start CampusFace API:', err);
+    console.error('❌ Failed to start Superior Connection API:', err);
     process.exit(1);
   }
 }

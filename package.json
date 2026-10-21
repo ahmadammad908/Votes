@@ -18,7 +18,9 @@
     "db:migrate": "npm run db:migrate --workspace=apps/api",
     "db:push": "npm run db:push --workspace=apps/api",
     "db:seed": "npm run db:seed --workspace=apps/api",
-    "db:generate": "npm run db:generate --workspace=apps/api"
+    "db:clean": "npm run db:clean --workspace=apps/api",
+    "db:generate": "npm run db:generate --workspace=apps/api",
+    "make-admin": "npm run make-admin --workspace=apps/api --"
   },
   "devDependencies": {
     "typescript": "^5.4.5"
