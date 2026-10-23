@@ -127,7 +127,7 @@ export default function ParticipantConsentPage() {
 
         const token = typeof window !== 'undefined' ? localStorage.getItem('campusface_auth_token') : null;
         const uploadRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/students/upload-photo`,
+          `${process.env.NEXT_PUBLIC_API_URL || 'https://votes-ul7p.onrender.com/api/v1'}/students/upload-photo`,
           {
             method: 'POST',
             headers: {

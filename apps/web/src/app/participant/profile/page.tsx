@@ -73,7 +73,7 @@ export default function ParticipantProfilePage() {
 
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('campusface_auth_token') : null;
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1'}/students/upload-photo`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://votes-ul7p.onrender.com/api/v1'}/students/upload-photo`, {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
