@@ -48,7 +48,7 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     try {
-      await apiClient<{ message: string }>('/auth/register/send-otp', {
+      await apiClient<{ message: string }>('https://votes-ul7p.onrender.com/api/v1/auth/register/send-otp', {
         method: 'POST',
         body: JSON.stringify({
           email,
@@ -75,7 +75,7 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     try {
-      const data = await apiClient<{ token: string; user: any }>('/auth/register/verify-otp', {
+      const data = await apiClient<{ token: string; user: any }>('https://votes-ul7p.onrender.com/api/v1/auth/register/verify-otp', {
         method: 'POST',
         body: JSON.stringify({ email, otp })
       });
@@ -97,7 +97,7 @@ export default function RegisterPage() {
     setSuccessMessage(null);
 
     try {
-      await apiClient<{ message: string }>('/auth/register/send-otp', {
+      await apiClient<{ message: string }>('https://votes-ul7p.onrender.com/api/v1/auth/register/send-otp', {
         method: 'POST',
         body: JSON.stringify({
           email,
