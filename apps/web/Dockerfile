@@ -1,24 +1,23 @@
-FROM node:20-alpine AS base
+
+FROM node:20-bookworm-slim AS base
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json* ./
-COPY packages/shared/package.json ./packages/shared/
-COPY apps/web/package.json ./apps/web/
+COPY package.json package-lock.json ./
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY apps/web/package.json ./apps/web/package.json
 
-RUN npm install
+RUN npm ci
 
-# Copy source
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
 
-WORKDIR /app/apps/web
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
-
-RUN npm run build
+RUN npm run build --workspace=@campusface/shared
+RUN npm run build --workspace=@campusface/web
 
 EXPOSE 3000
-CMD ["npm", "start"]
+
+CMD ["npm", "run", "start", "--workspace=@campusface/web"]
