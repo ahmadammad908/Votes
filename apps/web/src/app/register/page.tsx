@@ -97,7 +97,7 @@ export default function RegisterPage() {
     setSuccessMessage(null);
 
     try {
-      await apiClient<{ message: string }>('https://votes-ul7p.onrender.com/api/v1/auth/register/send-otp', {
+      await apiClient<{ message: string }>('/auth/register/send-otp', {
         method: 'POST',
         body: JSON.stringify({
           email,
